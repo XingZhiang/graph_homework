@@ -4,7 +4,7 @@
 #include <GL/glut.h>
 #include "Line.h"
 
-Line line(0,0,100,100);
+Line line(0,50,50,0);
 
 
 GLsizei winWidth = 800, winHeight = 500;
@@ -32,6 +32,10 @@ void DDA(){
     line.drawByDDA();
 }
 
+void Breseham(){
+    line.drawByBresenham();
+}
+
 int main(int argc, char** argv) {
     // ≥ı ºªØGLUT
     glutInit(&argc, argv);
@@ -44,7 +48,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("Hello World");
 
     init();
-    glutDisplayFunc(DDA);
+    glutDisplayFunc(Breseham);
     glutReshapeFunc(winReshapeFcn);
     glutMainLoop();
     

@@ -3,7 +3,7 @@ project(graph_lab)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(graph_lab DDA.cpp Line.h)
+add_executable(graph_lab main.cpp Line.h)
 
 target_link_libraries(graph_lab opengl32)
 target_link_libraries(graph_lab glu32)
