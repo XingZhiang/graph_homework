@@ -4,7 +4,10 @@
 #include <GL/glut.h>
 #include "Line.h"
 
-Line line(0,50,50,0);
+Line line1(0,0,100,50);
+Line line2(0, 0, 100, 200);
+Line line3(25, 100, 50, 0);
+Line line4(0, 100, 200, 0);
 
 
 GLsizei winWidth = 800, winHeight = 500;
@@ -29,11 +32,18 @@ void winReshapeFcn(GLint newWidth, GLint newHeight) {
 }
 
 void DDA(){
-    line.drawByDDA();
+    line1.drawByDDA();
+}
+
+void MidPoint() {
+    line1.drawByMidPoint();
+    line2.drawByMidPoint();
+    line3.drawByMidPoint();
+    line4.drawByMidPoint();
 }
 
 void Breseham(){
-    line.drawByBresenham();
+    line1.drawByBresenham();
 }
 
 int main(int argc, char** argv) {
@@ -48,7 +58,8 @@ int main(int argc, char** argv) {
     glutCreateWindow("Hello World");
 
     init();
-    glutDisplayFunc(Breseham);
+    //glutDisplayFunc(Breseham);
+    glutDisplayFunc(MidPoint);
     glutReshapeFunc(winReshapeFcn);
     glutMainLoop();
     
