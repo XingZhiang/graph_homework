@@ -25,7 +25,6 @@ public:
 Line::Line(int xS, int yS, int xE, int yE):
     start(xS,yS),end(xE,yE){}
 
-
 void Line::DDA(int xS, int yS, int xE, int yE) {
     int dx = xE - xS, dy = yE - yS, steps = 0;
     float xIncrement, yIncrement, x = static_cast<float >(xS), y = static_cast<float>(yS);
@@ -49,7 +48,7 @@ void Line::Bresenham(int xS, int yS, int xE, int yE) {
     int dx = xE - xS, dy = yE - yS;
     int x = xS, y = yS;
     setPixel(xS,yS);
-    int ux = dx > 0?1:-1;
+    int ux = dx > 0?1 : -1;
     int uy = dy > 0?1 : -1;
     dx = abs(dx); dy= abs(dy);
     if( dx > dy){
