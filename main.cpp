@@ -4,8 +4,10 @@
 #include "Circle.h"
 #include "Oval.h"
 
-Line line(0,50,50,0);
-Circle circle(200,200,100);
+Line line1(0,0,100,50);
+Line line2(0, 0, 100, 200);
+Line line3(25, 100, 50, 0);
+Line line4(0, 100, 200, 0);
 
 Oval oval(200,200,50,100);
 
@@ -31,11 +33,18 @@ void winReshapeFcn(GLint newWidth, GLint newHeight) {
 }
 
 void DDA(){
-    line.drawByDDA();
+    line1.drawByDDA();
+}
+
+void MidPoint() {
+    line1.drawByMidPoint();
+    line2.drawByMidPoint();
+    line3.drawByMidPoint();
+    line4.drawByMidPoint();
 }
 
 void Breseham(){
-    line.drawByBresenham();
+    line1.drawByBresenham();
 }
 
 void circle_draw(){
