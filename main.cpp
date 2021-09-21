@@ -1,14 +1,16 @@
 #define NDEBUG
-#include <cstdlib>
-#include <cmath>
 #include <GL/glut.h>
 #include "Line.h"
+#include "Circle.h"
+#include "Oval.h"
 
 Line line1(0,0,100,50);
 Line line2(0, 0, 100, 200);
 Line line3(25, 100, 50, 0);
 Line line4(0, 100, 200, 0);
 
+Circle circle(200,200,50);
+Oval oval(200,200,50,100);
 
 GLsizei winWidth = 800, winHeight = 500;
 // 光栅位置参数
@@ -46,6 +48,14 @@ void Breseham(){
     line1.drawByBresenham();
 }
 
+void circle_draw(){
+    circle.draw();
+}
+
+void oval_draw(){
+    oval.draw();
+};
+
 int main(int argc, char** argv) {
     // 初始化GLUT
     glutInit(&argc, argv);
@@ -58,8 +68,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("Hello World");
 
     init();
-    //glutDisplayFunc(Breseham);
-    glutDisplayFunc(MidPoint);
+    glutDisplayFunc(oval_draw);
     glutReshapeFunc(winReshapeFcn);
     glutMainLoop();
     
