@@ -3,19 +3,17 @@
 #define GRAPH_LAB_LINE_H
 #include <GL/glut.h>
 #include <cmath>
+#include "Point.h"
 
 class Line{
 private:
-    int xStart;
-    int yStart;
-    int xEnd;
-    int yEnd;
+    Point start;
+    Point end;
 
 public:
     Line() = delete;
     Line(int xS, int yS, int xE, int yE);
 private:
-    static void setPixel(int x, int y);
     static void DDA(int xS, int yS, int xE, int yE);
     static void Bresenham(int xS, int yS, int xE, int yE);
 
@@ -25,15 +23,8 @@ public:
 };
 
 Line::Line(int xS, int yS, int xE, int yE):
-    xStart(xS),yStart(yS),xEnd(xE),yEnd(yE){}
+    start(xS,yS),end(xE,yE){}
 
-void Line::setPixel(int x, int y) {
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_POINTS);
-    glVertex2i(x, y);
-    glEnd();
-    glFlush();
-}
 
 void Line::DDA(int xS, int yS, int xE, int yE) {
     int dx = xE - xS, dy = yE - yS, steps = 0;
@@ -51,7 +42,7 @@ void Line::DDA(int xS, int yS, int xE, int yE) {
 }
 
 void Line::drawByDDA() const {
-    DDA(xStart, yStart, xEnd, yEnd);
+    DDA(start.x, start.y, end.x, end.y);
 }
 
 void Line::Bresenham(int xS, int yS, int xE, int yE) {
@@ -89,7 +80,7 @@ void Line::Bresenham(int xS, int yS, int xE, int yE) {
 }
 
 void Line::drawByBresenham() const {
-    Bresenham(xStart, yStart, xEnd, yEnd);
+    Bresenham(start.x, start.y, end.x, end.y);
 }
 
 #endif //GRAPH_LAB_LINE_H
