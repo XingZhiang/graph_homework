@@ -9,6 +9,7 @@ Line line2(0, 0, 100, 200);
 Line line3(25, 100, 50, 0);
 Line line4(0, 100, 200, 0);
 
+Circle circle(200,200,50);
 Oval oval(200,200,50,100);
 
 GLsizei winWidth = 800, winHeight = 500;
