@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include <cmath>
 #include "Point.h"
+#include<algorithm>
 
 class Line {
 private:
@@ -55,13 +56,17 @@ void Line::drawByDDA() const {
 
 void Line::MidPoint(int xS, int yS, int xE,
                     int yE) {                                                                                                                                  //0 50 50 0
+    if (xS > xE) {
+        std::swap(xS, xE);
+        std::swap(yS, yE);
+    }
     int a = yS - yE, b = xE - xS, c = xS * yE - xE *
-                                                yS;                                                                           //Ö±Ïß·½³Ì 50 50 -250
+                                                yS;                                                                           //Ö±ï¿½ß·ï¿½ï¿½ï¿½ 50 50 -250
     int u = a * b > 0 ? 0
-                      : 1;                                                                                                     //Ð±ÂÊ´óÓÚ0Ê±u=1£¬·´Ö®=0
+                      : 1;                                                                                                     //Ð±ï¿½Ê´ï¿½ï¿½ï¿½0Ê±u=1ï¿½ï¿½ï¿½ï¿½Ö®=0
     int delta0 = u == 1 ? a + a + b : a + a - b, delta1 = u == 1 ? a + a : a + a - b - b, delta2 =
-            u == 1 ? a + a + b + b : a + a; //±ä»¯Á¿ 50 0 100
-    int x = xS, y = yS;                                                                                                            //µ±Ç°µã×ø±ê
+            u == 1 ? a + a + b + b : a + a; //ï¿½ä»¯ï¿½ï¿½ 50 0 100
+    int x = xS, y = yS;                                                                                                            //ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     setPixel(x, y);
     if (abs(a) <= abs(b)) { //|k|<=1
@@ -80,7 +85,7 @@ void Line::MidPoint(int xS, int yS, int xE,
                 u == 1 ? b + b : -b - b + a + a;
         int d = u == 1 ? 1 : -1;
         while (abs(y - yE) > 0) {
-            if (delta0 < 0) { //k>0Ê±x²»¶¯£¬k<0Ê±x+1
+            if (delta0 < 0) { //k>0Ê±xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½k<0Ê±x+1
                 y += d, x += 1 - u;
                 delta0 += delta2;
             } else {
