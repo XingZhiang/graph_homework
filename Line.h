@@ -55,18 +55,18 @@ void Line::drawByDDA() const {
 }
 
 void Line::MidPoint(int xS, int yS, int xE,
-                    int yE) {                                                                                                                                  //0 50 50 0
+                    int yE) {                                                                                                                                  
     if (xS > xE) {
         std::swap(xS, xE);
         std::swap(yS, yE);
     }
     int a = yS - yE, b = xE - xS, c = xS * yE - xE *
-                                                yS;                                                                           //ֱ�߷��� 50 50 -250
+                                                yS;                                                                           //ֱ直线方程 50 50 -250
     int u = a * b > 0 ? 0
-                      : 1;                                                                                                     //б�ʴ���0ʱu=1����֮=0
+                      : 1;                                                                                                     //斜率大于0时u=1，反之=0
     int delta0 = u == 1 ? a + a + b : a + a - b, delta1 = u == 1 ? a + a : a + a - b - b, delta2 =
-            u == 1 ? a + a + b + b : a + a; //�仯�� 50 0 100
-    int x = xS, y = yS;                                                                                                            //��ǰ������
+            u == 1 ? a + a + b + b : a + a; //变化量 50 0 100
+    int x = xS, y = yS;                                                                                                            //当前点坐标
 
     setPixel(x, y);
     if (abs(a) <= abs(b)) { //|k|<=1
@@ -85,7 +85,7 @@ void Line::MidPoint(int xS, int yS, int xE,
                 u == 1 ? b + b : -b - b + a + a;
         int d = u == 1 ? 1 : -1;
         while (abs(y - yE) > 0) {
-            if (delta0 < 0) { //k>0ʱx������k<0ʱx+1
+            if (delta0 < 0) { //k>0时x不动，k<0时x+1
                 y += d, x += 1 - u;
                 delta0 += delta2;
             } else {
