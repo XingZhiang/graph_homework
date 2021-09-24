@@ -10,7 +10,10 @@ Line line3(25, 100, 50, 0);
 Line line4(0, 100, 200, 0);
 
 Circle circle(200,200,50);
-Oval oval(200,200,50,100);
+Oval oval1(200,200,500,100);
+Oval oval2(200,200,100,50);
+Oval oval3(100,100,50,100);
+Oval oval4(300,300,50,100);
 
 GLsizei winWidth = 800, winHeight = 500;
 // 光栅位置参数
@@ -35,6 +38,8 @@ void winReshapeFcn(GLint newWidth, GLint newHeight) {
 
 void DDA(){
     line1.drawByDDA();
+    glFlush();
+
 }
 
 void MidPoint() {
@@ -42,18 +47,26 @@ void MidPoint() {
     line2.drawByMidPoint();
     line3.drawByMidPoint();
     line4.drawByMidPoint();
+    glFlush();
 }
 
 void Breseham(){
     line1.drawByBresenham();
+    glFlush();
 }
 
 void circle_draw(){
     circle.draw();
+    glFlush();
 }
 
 void oval_draw(){
-    oval.draw();
+    oval1.draw();
+    oval2.draw();
+    oval3.draw();
+    oval4.draw();
+    glFlush();
+
 };
 
 int main(int argc, char** argv) {
@@ -66,6 +79,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize(winWidth, winHeight);
     // 创建窗口
     glutCreateWindow("Hello World");
+
 
     init();
     glutDisplayFunc(oval_draw);
