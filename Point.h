@@ -14,7 +14,7 @@ public:
     int y;
 public:
     Point(int x_value, int y_value):x(x_value),y(y_value){}
-    Point(Point &p):x(p.x),y(p.y){}
+    Point(const Point &p):x(p.x),y(p.y){}
 };
 
 /*********************************

@@ -1,5 +1,5 @@
 /*
- * 园类
+ * 圆类
  */
 #ifndef GRAPH_LAB_CIRCLE_H
 #define GRAPH_LAB_CIRCLE_H
@@ -11,6 +11,7 @@ private:
 public:
     Circle() = delete;
     Circle(int x, int y, int r);
+    Circle(const Point &cen, int r);
 
 private:
     void midpoint(int xCtr, int yCtr) const;
@@ -21,7 +22,6 @@ private:
 
 public:
     void draw() const;
-
 };
 
 Circle::Circle(int x, int y, int r):
@@ -33,10 +33,14 @@ void Circle::midpoint(int xCtr, int yCtr) const {
     Complete(xCtr, yCtr + radius);
     while(x < y){
         if(p < 0){
-            Complete(++x + xCtr, y + yCtr);
+            int tmp_x = ++x;
+            Complete(tmp_x + xCtr, y + yCtr);
+            Complete(y + xCtr, tmp_x + yCtr);
             p = p + 2*x +1;
         }else{
-            Complete(++x + xCtr, --y + yCtr);
+            int tmp_x = ++x, tmp_y = --y;
+            Complete(tmp_x + xCtr, tmp_y + yCtr);
+            Complete(tmp_y + xCtr, tmp_x + yCtr);
             p = p + 2*x +1 - 2*y;
         }
     }
@@ -49,14 +53,12 @@ void Circle::draw() const {
 
 void Circle::Complete(int x, int y) const {
     setPixel(x,y);
-    setPixel(y,x);
     setPixel(2*center.x-x,y);
-    setPixel(2*center.y-y,x);
     setPixel(x,2*center.y-y);
-    setPixel(y,2*center.x-x);
     setPixel(2*center.x-x,2*center.y-y);
-    setPixel(2*center.y-y,2*center.x-x);
 }
+
+Circle::Circle(const Point &cen, int r):center(cen),radius(r){}
 
 
 #endif //GRAPH_LAB_CIRCLE_H
