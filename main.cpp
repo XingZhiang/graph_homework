@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <GL/glut.h>
 #include <iostream>
 #include "Line.h"
