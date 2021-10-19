@@ -2,7 +2,6 @@
 #ifndef GRAPH_LAB_LINE_H
 #define GRAPH_LAB_LINE_H
 
-#include <GL/glut.h>
 #include <cmath>
 #include "Point.h"
 #include<algorithm>
@@ -16,6 +15,8 @@ public:
     Line() = delete;
 
     Line(int xS, int yS, int xE, int yE);
+
+    Line(Point s, Point e);
 
 private:
     static void DDA(int xS, int yS, int xE, int yE);
@@ -141,5 +142,7 @@ void Line::Bresenham(int xS, int yS, int xE, int yE) {
 void Line::drawByBresenham() const {
     Bresenham(start.x, start.y, end.x, end.y);
 }
+
+Line::Line(Point s, Point e) : start(s), end(e){}
 
 #endif //GRAPH_LAB_LINE_H

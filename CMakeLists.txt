@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 project(graph_lab)
 
+find_package(GLUT REQUIRED)
+
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(graph_lab main.cpp Line.h Point.h Circle.h Oval.h)
