@@ -5,16 +5,18 @@
 #include "Circle.h"
 #include "Oval.h"
 #include <vector>
+#include <Windows.h>
 
 // Oval oval1(200,200,500,100);
 
 std::vector<Point> point;
-enum drawType {line_DDA, line_midpoint, line_Bre, circle_mid,CLEAR};
+enum drawType { line_DDA, line_midpoint, line_Bre, circle_mid, polygen, CLEAR, help, TODO };
 drawType type = line_Bre;
 GLsizei winWidth = 800, winHeight = 500;
 // 光栅位置参数
 GLint xRaster = 25, yRaster = 150;
 GLint x = 30;
+bool status = false;
 
 
 void init( ) {
@@ -41,6 +43,11 @@ void Drew();
  ********************************/
 void mouseCB(int button, int state, int x, int y);
 
+/*********************************
+ * 键盘回调函数
+ ********************************/
+void keyboardCB(unsigned char key, int x, int y);
+
 /*******************************
  * 右键菜单功能设置
  ******************************/
@@ -66,6 +73,7 @@ int main(int argc, char** argv) {
     init();
 
     glutMouseFunc(mouseCB);
+    glutKeyboardFunc(keyboardCB);
     glutDisplayFunc(Drew);
     //glutIdleFunc(line_dda_drew);
     glutReshapeFunc(winReshapeFcn);
@@ -81,7 +89,7 @@ void winReshapeFcn(GLint newWidth, GLint newHeight) {
 }
 
 void Drew(){
-    if(point.size()==2){
+    if(type != polygen && point.size()==2){
         Point start = point[0];
         Point end = point[1];
         switch (type) {
@@ -112,11 +120,17 @@ void Drew(){
                 break;
             }
             default:{
-                Line line(start,end);
-                line.drawByDDA();
+                //Line line(start,end);
+                //line.drawByDDA();
                 point.clear();
             }
         }
+    }
+    else if (type == polygen && point.size() >= 2) {
+        Point start = *(point.end() - 2);
+        Point end = *(point.end() - 1);
+        Line line(start, end);
+        line.drawByBresenham();
     }
     setPixel(0,0);
     glFlush();
@@ -133,25 +147,48 @@ void mouseCB(int button, int state, int x, int y){
     }
 }
 
+void keyboardCB(unsigned char key, int x, int y) {
+    if (type == polygen && key == '\r') {
+        Point start = *(point.begin());
+        Point end = *(point.end() - 1);
+        Line line(start, end);
+        line.drawByBresenham();
+        setPixel(0, 0);
+        glFlush();
+        point.clear();
+    }
+}
+
 void processMenuEvents(int option) {
     //option，就是传递过来的value的值。
     switch (option) {
         case line_DDA:
             type = line_DDA;
             break;
-            case line_midpoint:
-                type = line_midpoint;
-                break;
-            case line_Bre:
-                type = line_Bre;
-                break;
-            case circle_mid:
-                type = circle_mid;
-                break;
-            case CLEAR:
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // (or whatever buffer you want to clear)
-            default:
-                type = line_Bre;
+        case line_midpoint:
+            type = line_midpoint;
+            break;
+        case line_Bre:
+            type = line_Bre;
+            break;
+        case circle_mid:
+            type = circle_mid;
+            break;
+        case polygen:
+            type = polygen;
+            break;
+        case CLEAR:
+            type = TODO;
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // (or whatever buffer you want to clear)
+            glFlush();
+            break;
+        case help:
+            type = TODO;
+            MessageBoxA(0, "When drawing a polygen, press ENTER to finish", "help", MB_OK | MB_ICONEXCLAMATION);
+            MessageBoxA(0, "If nothing happened after choose clear, just click the mouse", "help", MB_OK | MB_ICONEXCLAMATION);
+            break;
+        default:
+            type = TODO;
     }
 }
 
@@ -164,7 +201,9 @@ void createGLUTMenus() {
     glutAddMenuEntry("midpoint",line_midpoint);
     glutAddMenuEntry("Bresenhem",line_Bre);
     glutAddMenuEntry("Cirlce",circle_mid);
+    glutAddMenuEntry("Polygen", polygen);
     glutAddMenuEntry("clear",CLEAR);
+    glutAddMenuEntry("Help", help);
     //把菜单和鼠标右键关联起来。
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
