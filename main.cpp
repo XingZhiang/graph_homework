@@ -1,28 +1,32 @@
 #define NDEBUG
 #include <GL/glut.h>
 #include <iostream>
+#include "Color.h"
 #include "Line.h"
 #include "Circle.h"
 #include "Oval.h"
+#include "fillArea.h"
 #include <vector>
 #include <Windows.h>
 
 // Oval oval1(200,200,500,100);
 
 std::vector<Point> point;
-enum drawType { line_DDA, line_midpoint, line_Bre, circle_mid, polygen, CLEAR, help, TODO };
+enum drawType { line_DDA, line_midpoint, line_Bre, circle_mid, polygen, fill, CLEAR, help, TODO };
 drawType type = line_Bre;
 GLsizei winWidth = 800, winHeight = 500;
+//GLsizei winWidth = 300, winHeight = 200;  //测试用窗口
 // 光栅位置参数
 GLint xRaster = 25, yRaster = 150;
 GLint x = 30;
 bool status = false;
-
+COLOR winColor[800][500];   //窗口像素颜色
 
 void init( ) {
     // 白色背景
     glEnable(GL_BLEND);
     glClearColor(1.0, 1.0, 1.0, 1.0);
+    glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, winColor);
     // glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0.0, 600.0, 0.0, 500.0);
@@ -132,6 +136,11 @@ void Drew(){
         Line line(start, end);
         line.drawByBresenham();
     }
+    else if (type == fill && point.size() == 1) {
+        Point p = point[0];
+        fillArea(p, 0x00ff00);
+        point.clear();
+    }
     setPixel(0,0);
     glFlush();
 }
@@ -177,10 +186,14 @@ void processMenuEvents(int option) {
         case polygen:
             type = polygen;
             break;
+        case fill:
+            type = fill;
+            break;
         case CLEAR:
             type = TODO;
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // (or whatever buffer you want to clear)
             glFlush();
+            glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, winColor);
             break;
         case help:
             type = TODO;
@@ -194,16 +207,23 @@ void processMenuEvents(int option) {
 
 void createGLUTMenus() {
     int menu;
+    int submenu_Line;
+    //创建子菜单
+    submenu_Line = glutCreateMenu(processMenuEvents);
+    //添加条目
+    glutAddMenuEntry("DDA", line_DDA);
+    glutAddMenuEntry("midpoint", line_midpoint);
+    glutAddMenuEntry("Bresenhem", line_Bre);
     //创建菜单并告诉GLUT，processMenuEvents处理菜单事件。
     menu = glutCreateMenu(processMenuEvents);
     //给菜单增加条目
-    glutAddMenuEntry("DDA",line_DDA);
-    glutAddMenuEntry("midpoint",line_midpoint);
-    glutAddMenuEntry("Bresenhem",line_Bre);
+    glutAddSubMenu("Line", submenu_Line);
     glutAddMenuEntry("Cirlce",circle_mid);
     glutAddMenuEntry("Polygen", polygen);
+    glutAddMenuEntry("Fill", fill);
     glutAddMenuEntry("clear",CLEAR);
     glutAddMenuEntry("Help", help);
+
     //把菜单和鼠标右键关联起来。
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
