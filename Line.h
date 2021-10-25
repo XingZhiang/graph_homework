@@ -5,6 +5,17 @@
 #include <cmath>
 #include "Point.h"
 #include<algorithm>
+#include<utility>
+
+#define LEFT 1
+#define RIGHT 2
+#define BOTTOM 4
+#define TOP 8
+#define XL 200
+#define XR 600
+#define YB 125
+#define YT 375
+int encode(Point p);
 
 class Line {
 private:
@@ -17,6 +28,11 @@ public:
     Line(int xS, int yS, int xE, int yE);
 
     Line(Point s, Point e);
+
+    void set(Point s, Point e) {
+        start = s;
+        end = e;
+    }
 
 private:
     static void DDA(int xS, int yS, int xE, int yE);
@@ -31,6 +47,8 @@ public:
     void drawByMidPoint() const;
 
     void drawByBresenham() const;
+
+    void drawByCohenSutherland() const;
 };
 
 Line::Line(int xS, int yS, int xE, int yE) :
@@ -143,6 +161,57 @@ void Line::drawByBresenham() const {
     Bresenham(start.x, start.y, end.x, end.y);
 }
 
+void Line::drawByCohenSutherland() const
+{
+    Point p1(start);
+    Point p2(end);
+    Point p(0, 0);
+    int code1, code2, code;
+    code1 = encode(p1);
+    code2 = encode(p2);             // 端点坐标编码
+    while (code1 != 0 || code2 != 0)     // 直到”完全可见”
+    {
+        if ((code1 & code2) != 0) return;  // 排除”显然不可见”情况
+        code = code1;
+        if (code1 == 0) code = code2;    // 求得在窗口外的点
+             //按顺序检测到端点的编码不为0，才把线段与对应的窗口边界求交。
+        if ((LEFT & code) != 0)                 // 线段与窗口左边延长线相交
+        {
+            p.x = XL;
+            p.y = p1.y + (p2.y - p1.y) * (XL - p1.x) / (float)(p2.x - p1.x);
+        }
+        else if ((RIGHT & code) != 0)        // 线段与窗口右边延长线相交
+        {
+            p.x = XR;
+            p.y = p1.y + (p2.y - p1.y) * (XR - p1.x) / (float)(p2.x - p1.x);
+        }
+        else if ((BOTTOM & code) != 0)     // 线段与窗口下边延长线相交
+        {
+            p.y = YB;
+            p.x = p1.x + (p2.x - p1.x) * (YB - p1.y) / (float)(p2.y - p1.y);
+        }
+        else if ((TOP & code) != 0)         // 线段与窗口上边延长线相交
+        {
+            p.y = YT;
+            p.x = p1.x + (p2.x - p1.x) * (YT - p1.y) / (float)(p2.y - p1.y);
+        }
+        if (code == code1) { p1.x = p.x; p1.y = p.y; code1 = encode(p); } //裁去P1到交点
+        else { p2.x = p.x; p2.y = p.y; code2 = encode(p); }                     //裁去P2到交点
+    }
+    Line line1(p1, p2);
+    line1.drawByBresenham();
+}
+
 Line::Line(Point s, Point e) : start(s), end(e){}
+
+int encode(Point p)
+{
+    int c = 0;
+    if (p.x < XL) c |= LEFT;
+    if (p.x > XR) c |= RIGHT;
+    if (p.y < YB) c |= BOTTOM;
+    if (p.y > YT) c |= TOP;
+    return c;
+}
 
 #endif //GRAPH_LAB_LINE_H

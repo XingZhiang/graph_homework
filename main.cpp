@@ -5,22 +5,27 @@
 #include "Line.h"
 #include "Circle.h"
 #include "Oval.h"
+#include "Polygen.h"
 #include "fillArea.h"
+#include "cut.h"
 #include <vector>
 #include <Windows.h>
 
 // Oval oval1(200,200,500,100);
 
 std::vector<Point> point;
-enum drawType { line_DDA, line_midpoint, line_Bre, circle_mid, polygen, fill, CLEAR, help, TODO };
-drawType type = line_Bre;
+enum drawType {
+    line_DDA, line_midpoint, line_Bre, circle_mid, polygen, fill, new_window, CohenSutherland,
+    SutherlandHodgman, RED, GREEN, BLUE, CLEAR, help, TODO
+};
+drawType type = TODO;
 GLsizei winWidth = 800, winHeight = 500;
-//GLsizei winWidth = 300, winHeight = 200;  //测试用窗口
 // 光栅位置参数
 GLint xRaster = 25, yRaster = 150;
 GLint x = 30;
 bool status = false;
 COLOR winColor[800][500];   //窗口像素颜色
+COLOR pen;
 
 void init( ) {
     // 白色背景
@@ -73,7 +78,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize(winWidth, winHeight);
     // 创建窗口
     glutCreateWindow("Hello World");
-
+    pen.setColor(255, 0, 0);
     init();
 
     glutMouseFunc(mouseCB);
@@ -123,6 +128,17 @@ void Drew(){
                 point.clear();
                 break;
             }
+            case CohenSutherland: {
+                Line line4(start, end);
+                line4.drawByCohenSutherland();
+                point.clear();
+                break;
+            }
+            case polygen: {
+                break;
+            }
+            case SutherlandHodgman:
+                break;
             default:{
                 //Line line(start,end);
                 //line.drawByDDA();
@@ -130,15 +146,16 @@ void Drew(){
             }
         }
     }
-    else if (type == polygen && point.size() >= 2) {
+    /*else if (type == polygen && point.size() >= 2) {
         Point start = *(point.end() - 2);
         Point end = *(point.end() - 1);
         Line line(start, end);
         line.drawByBresenham();
     }
+    */
     else if (type == fill && point.size() == 1) {
         Point p = point[0];
-        fillArea(p, 0x00ff00);
+        fillArea(p, pen);
         point.clear();
     }
     setPixel(0,0);
@@ -157,12 +174,12 @@ void mouseCB(int button, int state, int x, int y){
 }
 
 void keyboardCB(unsigned char key, int x, int y) {
-    if (type == polygen && key == '\r') {
-        Point start = *(point.begin());
-        Point end = *(point.end() - 1);
-        Line line(start, end);
-        line.drawByBresenham();
-        setPixel(0, 0);
+    if ((type == polygen || type == SutherlandHodgman) && key == '\r') {
+        Polygen poly(point);
+        if (type == SutherlandHodgman) {
+            poly.drawBySutherlandHodgman();
+        }
+        poly.draw();
         glFlush();
         point.clear();
     }
@@ -186,8 +203,40 @@ void processMenuEvents(int option) {
         case polygen:
             type = polygen;
             break;
+        case SutherlandHodgman:
+            type = SutherlandHodgman;
+            break;
         case fill:
             type = fill;
+            break;
+        case new_window: {
+            Point a(200, 125), b(600, 125);
+            Line line(a, b);
+            line.drawByBresenham();
+            a.set(600, 375);
+            line.set(a, b);
+            line.drawByBresenham();
+            b.set(200, 375);
+            line.set(a, b);
+            line.drawByBresenham();
+            a.set(200, 125);
+            line.set(a, b);
+            line.drawByBresenham();
+            glFlush();
+            type = TODO;
+            break;
+        }
+        case CohenSutherland:
+            type = CohenSutherland;
+            break;
+        case RED:
+            pen.setColor(255, 0, 0);
+            break;
+        case GREEN:
+            pen.setColor(0, 255, 0);
+            break;
+        case BLUE:
+            pen.setColor(0, 0, 255);
             break;
         case CLEAR:
             type = TODO;
@@ -208,22 +257,31 @@ void processMenuEvents(int option) {
 void createGLUTMenus() {
     int menu;
     int submenu_Line;
+    int color_menu;
     //创建子菜单
     submenu_Line = glutCreateMenu(processMenuEvents);
     //添加条目
     glutAddMenuEntry("DDA", line_DDA);
     glutAddMenuEntry("midpoint", line_midpoint);
     glutAddMenuEntry("Bresenhem", line_Bre);
+    glutAddMenuEntry("CohenSutherland", CohenSutherland);
+    color_menu = glutCreateMenu(processMenuEvents);
+    glutAddMenuEntry("RED", RED);
+    glutAddMenuEntry("GREEN", GREEN);
+    glutAddMenuEntry("BLUE", BLUE);
     //创建菜单并告诉GLUT，processMenuEvents处理菜单事件。
     menu = glutCreateMenu(processMenuEvents);
     //给菜单增加条目
     glutAddSubMenu("Line", submenu_Line);
     glutAddMenuEntry("Cirlce",circle_mid);
     glutAddMenuEntry("Polygen", polygen);
+    glutAddMenuEntry("SutherlandHodgman", SutherlandHodgman);
     glutAddMenuEntry("Fill", fill);
+    glutAddSubMenu("Color", color_menu);
+    glutAddMenuEntry("New Window", new_window);
     glutAddMenuEntry("clear",CLEAR);
     glutAddMenuEntry("Help", help);
-
+    
     //把菜单和鼠标右键关联起来。
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }

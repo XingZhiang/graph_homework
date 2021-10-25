@@ -1,64 +1,149 @@
-/*
- * 圆类
- */
 #ifndef GRAPH_LAB_POLYGEN_H
 #define GRAPH_LAB_POLYGEN_H
 #include "Point.h"
+#include "Line.h"
 #include <vector>
+#include<utility>
+
 class Polygen{
-private:
-    std::vector<Point> point;  //圆心
 public:
-    Polygen() = delete;
-    Polygen(int x, int y, int r);
-    Polygen(const Point &cen, int r);
+    std::vector<Point> point;  //顶点集
+    std::vector<Line> vertex;   //边集
+public:
+    Polygen(){}
+    Polygen(std::vector<Point> p);
+    //Polygen(const Point &cen, int r);
 
 private:
-    void midpoint(int xCtr, int yCtr) const;
-    /****************************
-     * 由八分之一圆补全到整个园
-     ***************************/
-    void Complete(int x, int y) const;
-
 public:
     void draw() const;
+    void drawBySutherlandHodgman();
+    void setVertex();
 };
 
-Polygen::Polygen(int x, int y, int r):
-    center(x,y), radius(r){}
-
-void Polygen::midpoint(int xCtr, int yCtr) const {
-    int x = 0, y = radius;
-    float p = 5.0f/4.0f - static_cast<float>(radius);
-    Complete(xCtr, yCtr + radius);
-    while(x < y){
-        if(p < 0){
-            int tmp_x = ++x;
-            Complete(tmp_x + xCtr, y + yCtr);
-            Complete(y + xCtr, tmp_x + yCtr);
-            p = p + 2*x +1;
-        }else{
-            int tmp_x = ++x, tmp_y = --y;
-            Complete(tmp_x + xCtr, tmp_y + yCtr);
-            Complete(tmp_y + xCtr, tmp_x + yCtr);
-            p = p + 2*x +1 - 2*y;
-        }
+Polygen::Polygen(std::vector<Point> p):point(p) {
+    for (auto iter = p.begin(); iter != p.end() - 1; iter++) {
+        Line line(*iter, *(iter + 1));
+        vertex.push_back(line);
     }
-
+    Line line(*p.begin(), *(p.end() - 1));
+    vertex.push_back(line);
 }
+
+
 
 void Polygen::draw() const {
-    midpoint(center.x,center.y);
+    for (auto line : vertex) {
+        line.drawByBresenham();
+    }
 }
 
-void Polygen::Complete(int x, int y) const {
-    setPixel(x,y);
-    setPixel(2*center.x-x,y);
-    setPixel(x,2*center.y-y);
-    setPixel(2*center.x-x,2*center.y-y);
+
+void Polygen::drawBySutherlandHodgman()
+{
+    Polygen res;
+    Point s(0, 0), p(0, 0), ip(0, 0);
+    int j;
+    s = *(point.end() - 1);
+    for (j = 0; j < point.size(); j++) {
+        p = point[j];
+        if (p.x >= XL) {
+            if (s.x >= XL) {
+                res.point.push_back(p);
+            }
+            else {
+                ip.x = XL;
+                ip.y = s.y + (p.y - s.y) * (XL - s.x) / (float)(p.x - s.x);
+                res.point.push_back(ip);
+                res.point.push_back(p);
+            }
+        }
+        else if (s.x >= XL) {
+            ip.x = XL;
+            ip.y = s.y + (p.y - s.y) * (XL - s.x) / (float)(p.x - s.x);
+            res.point.push_back(ip);
+        }
+        s = p;
+    }
+    point.clear();
+    s = *(res.point.end() - 1);
+    for (j = 0; j < res.point.size(); j++) {
+        p = res.point[j];
+        if (p.y <= YT) {
+            if (s.y <= YT) {
+                point.push_back(p);
+            }
+            else {
+                ip.x = p.x + (s.x - p.x) * (YT - p.y) / (float)(s.y - p.y);
+                ip.y = YT;
+                point.push_back(ip);
+                point.push_back(p);
+            }
+        }
+        else if (s.y <= YT) {
+            ip.x = p.x + (s.x - p.x) * (YT - p.y) / (float)(s.y - p.y);
+            ip.y = YT;
+            point.push_back(ip);
+        }
+        s = p;
+    }
+    res.point.clear();
+    s = *(point.end() - 1);
+    for (j = 0; j < point.size(); j++) {
+        p = point[j];
+        if (p.x <= XR) {
+            if (s.x <= XR) {
+                res.point.push_back(p);
+            }
+            else {
+                ip.x = XR;
+                ip.y = s.y + (p.y - s.y) * (XR - s.x) / (float)(p.x - s.x);
+                res.point.push_back(ip);
+                res.point.push_back(p);
+            }
+        }
+        else if (s.x <= XR) {
+            ip.x = XR;
+            ip.y = s.y + (p.y - s.y) * (XR - s.x) / (float)(p.x - s.x);
+            res.point.push_back(ip);
+        }
+        s = p;
+    }
+    point.clear();
+    s = *(res.point.end() - 1);
+    for (j = 0; j < res.point.size(); j++) {
+        p = res.point[j];
+        if (p.y >= YB) {
+            if (s.y >= YB) {
+                point.push_back(p);
+            }
+            else {
+                ip.x = p.x + (s.x - p.x) * (YB - p.y) / (float)(s.y - p.y);
+                ip.y = YB;
+                point.push_back(ip);
+                point.push_back(p);
+            }
+        }
+        else if (s.y >= YB) {
+            ip.x = p.x + (s.x - p.x) * (YB - p.y) / (float)(s.y - p.y);
+            ip.y = YB;
+            point.push_back(ip);
+        }
+        s = p;
+    }
+    vertex.clear();
+    setVertex();
 }
 
-Polygen::Polygen(const Point &cen, int r):center(cen),radius(r){}
+void Polygen::setVertex()
+{
+    for (auto iter = point.begin(); iter != point.end() - 1; iter++) {
+        Line line(*iter, *(iter + 1));
+        vertex.push_back(line);
+    }
+    Line line(*point.begin(), *(point.end() - 1));
+    vertex.push_back(line);
+}
 
 
 #endif //GRAPH_LAB_POLYGEN_H

@@ -17,6 +17,11 @@ public:
     bool operator!=(COLOR& b) {
         return R != b.R || G != b.G || B != b.B;
     }
+    void setColor(BYTE r, BYTE g, BYTE b) {
+        R = r;
+        G = g;
+        B = b;
+    }
 };
 
 COLOR::COLOR(UINT color){
