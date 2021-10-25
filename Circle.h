@@ -44,6 +44,8 @@ void Circle::midpoint(int xCtr, int yCtr) const {
             p = p + 2*x +1 - 2*y;
         }
     }
+    setPixel(center.x - radius, center.y);
+    setPixel(center.x + radius, center.y);
 
 }
 
